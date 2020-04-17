@@ -1,7 +1,3 @@
-import Alert from './components/Alert/Alert';
-import Ciccio from './components/Ciccio/Ciccio';
+import Alert from "./components/Alert/Alert";
 
-export {
-    Alert,
-    Ciccio
-};
+export { Alert };
