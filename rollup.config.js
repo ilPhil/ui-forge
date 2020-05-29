@@ -1,31 +1,57 @@
-import babel from "rollup-plugin-babel";
-import commonjs from "rollup-plugin-commonjs";
-import postcss from "rollup-plugin-postcss";
-import resolve from "rollup-plugin-node-resolve";
-import { uglify } from "rollup-plugin-uglify";
+import peerDepsExternal from 'rollup-plugin-peer-deps-external';
+import resolve from '@rollup/plugin-node-resolve';
+import commonjs from '@rollup/plugin-commonjs';
+import typescript from 'rollup-plugin-typescript2';
+import { getBabelOutputPlugin } from '@rollup/plugin-babel';
 
-export default {
-  input: "src/index.js",
-  output: {
-    file: "./build/bundle.min.js",
-    format: "cjs",
+import packageJson from './package.json';
+
+export default [
+  {
+    input: 'src/index.ts',
+    output: {
+      file: packageJson.module,
+      format: 'esm',
+      sourcemap: true,
+    },
+    external: ['styled-components'],
+    plugins: [
+      peerDepsExternal(),
+      typescript({ useTsconfigDeclarationDir: true }),
+      // transpile esnext to es5 (IE support)
+      getBabelOutputPlugin({
+        presets: ['@babel/preset-env'],
+      }),
+    ],
   },
-  // All the used libs needs to be here
-  external: ["react", "react-proptypes"],
-  plugins: [
-    postcss({
-      plugins: [],
-      minimize: true,
-      sourceMap: "inline",
-    }),
-    babel({
-      presets: ["@babel/preset-react", "@babel/preset-env"],
-      // plugins: ["@babel/plugin-external-helpers"],
-      exclude: "node_modules/**",
-      runtimeHelpers: true,
-    }),
-    commonjs(),
-    resolve(),
-    uglify(),
-  ],
-};
+
+  // SSR build.
+  {
+    input: 'src/index.ts',
+    output: {
+      file: packageJson.main,
+      format: 'cjs',
+      sourcemap: true,
+    },
+    external: ['styled-components'],
+    plugins: [
+      peerDepsExternal(),
+      resolve(),
+      commonjs(),
+      typescript({ useTsconfigDeclarationDir: true }),
+      // transpile esnext to node 12 compatible build.
+      getBabelOutputPlugin({
+        presets: [
+          [
+            '@babel/preset-env',
+            {
+              targets: {
+                node: '12',
+              },
+            },
+          ],
+        ],
+      }),
+    ],
+  },
+];

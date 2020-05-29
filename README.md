@@ -1,4 +1,5 @@
 # ui-forge
+
 UI components boilerplate 😈
 
 :construction: **Under construction** :construction:
@@ -8,8 +9,15 @@ UI components boilerplate 😈
 ```sh
 $ npm install
 ```
+
 ## Usage
 
 ```sh
 $ npm run build
+```
+
+## Storybook
+
+```sh
+$ npm run storybook
 ```
